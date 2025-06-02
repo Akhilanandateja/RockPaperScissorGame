@@ -1,0 +1,148 @@
+<!-- game.html -->
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock, Paper, Scissors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.3s;
+        }
+        .dark body {
+            background: linear-gradient(135deg, #1e293b, #475569);
+        }
+        .choice-btn {
+            transition: all 0.3s ease;
+        }
+        .choice-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        .result-box {
+            animation: fadeIn 0.5s ease-in;
+        }
+        .result-pulse {
+            animation: pulse 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .spinner {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="min-h-screen">
+        <header class="bg-blue-900 dark:bg-gray-900 text-white p-4 shadow-md">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Rock, Paper, Scissors</h1>
+                <div class="flex items-center gap-4">
+                    <span class="font-semibold">Welcome, {{ username }}</span>
+                    <a href="{{ url_for('profile') }}" class="btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                    <button id="theme-toggle" class="text-gray-200 hover:text-gray-400">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <div class="flex justify-center items-center mt-8">
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-lg w-full">
+                <h2 class="text-3xl font-bold text-center text-blue-900 dark:text-blue-300 mb-6">Play the Game</h2>
+                <div class="text-center text-lg mb-4">
+                    <p class="text-gray-700 dark:text-gray-300">Player: <span class="font-semibold">{{ username }}</span></p>
+                    <p class="text-gray-700 dark:text-gray-300">Wins: {{ player_wins }} | Total Games: {{ total_games }} | Win %: {{ win_percentage }}%</p>
+                    <p class="text-gray-700 dark:text-gray-300">Scores - You: {{ player_score }} | Computer: {{ computer_score }}</p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Round: {{ current_round if current_round <= max_rounds or max_rounds is none else max_rounds }}{% if max_rounds %} / {{ max_rounds }}{% else %} (Infinity){% endif %}
+                    </p>
+                </div>
+                <div class="result-box text-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg mb-6 {% if result %}result-pulse{% endif %}">
+                    {% if player_choice and computer_choice %}
+                        <p class="text-lg text-gray-800 dark:text-gray-200">Your choice: <span class="font-semibold capitalize">{{ player_choice }}</span></p>
+                        <p class="text-lg text-gray-800 dark:text-gray-200">Computer's choice: <span class="font-semibold capitalize">{{ computer_choice }}</span></p>
+                    {% endif %}
+                    <p class="text-2xl font-bold {% if 'Game Over' in result %}text-green-600 dark:text-green-400{% else %}text-blue-800 dark:text-blue-400{% endif %} mt-2">{{ result }}</p>
+                </div>
+                {% if not game_over %}
+                    <form method="POST" class="space-y-4" id="game-form">
+                        <div class="flex justify-center gap-4">
+                            <button type="submit" name="choice" value="rock" class="choice-btn bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">
+                                <i class="fas fa-hand-rock"></i> Rock
+                            </button>
+                            <button type="submit" name="choice" value="paper" class="choice-btn bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">
+                                <i class="fas fa-hand-paper"></i> Paper
+                            </button>
+                            <button type="submit" name="choice" value="scissors" class="choice-btn bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600">
+                                <i class="fas fa-hand-scissors"></i> Scissors
+                            </button>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" name="quit" value="quit" class="choice-btn bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">
+                                <i class="fas fa-stop"></i> Quit
+                            </button>
+                            <div class="spinner" id="game-spinner"></div>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="text-center">
+                        <a href="{{ url_for('rounds') }}" class="btn bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">
+                            <i class="fas fa-play"></i> Play Again
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script>
+        const toggleButton = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        if (localStorage.getItem('theme') === 'dark') {
+            htmlElement.classList.add('dark');
+            toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        toggleButton.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            if (htmlElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                localStorage.setItem('theme', 'light');
+                toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+        document.getElementById('game-form')?.addEventListener('submit', () => {
+            document.getElementById('game-spinner').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

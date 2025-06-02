@@ -1,0 +1,125 @@
+<!-- rounds.html -->
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Rounds - Rock, Paper, Scissors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.3s;
+        }
+        .dark body {
+            background: linear-gradient(135deg, #1e293b, #475569);
+        }
+        .box {
+            animation: fadeIn 0.8s ease-in;
+        }
+        .btn {
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spinner {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="min-h-screen">
+        <header class="bg-blue-900 dark:bg-gray-900 text-white p-4 shadow-md">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Rock, Paper, Scissors</h1>
+                <div class="flex items-center gap-4">
+                    <span class="font-semibold">Welcome, {{ username }}</span>
+                    <a href="{{ url_for('profile') }}" class="btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                    <button id="theme-toggle" class="text-gray-200 hover:text-gray-400">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <div class="flex justify-center items-center mt-8">
+            <div class="box bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full">
+                <h2 class="text-3xl font-bold text-center text-blue-900 dark:text-blue-300 mb-6">Choose Rounds</h2>
+                <div class="text-center text-lg mb-4">
+                    <p class="text-gray-700 dark:text-gray-300">Player: <span class="font-semibold">{{ username }}</span></p>
+                    <p class="text-gray-700 dark:text-gray-300">Wins: {{ player_wins }} | Total Games: {{ total_games }} | Win %: {{ win_percentage }}%</p>
+                </div>
+                <form method="POST" class="space-y-4" id="rounds-form">
+                    <div class="text-center">
+                        <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Number of Rounds</label>
+                        <select name="rounds" class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white w-full" required>
+                            <option value="3">3 Rounds</option>
+                            <option value="5" selected>5 Rounds</option>
+                            <option value="7">7 Rounds</option>
+                            <option value="infinity">Infinity</option>
+                        </select>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 w-full">
+                            <i class="fas fa-play"></i> Start Game
+                        </button>
+                        <div class="spinner" id="rounds-spinner"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        const toggleButton = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        if (localStorage.getItem('theme') === 'dark') {
+            htmlElement.classList.add('dark');
+            toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        toggleButton.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            if (htmlElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                localStorage.setItem('theme', 'light');
+                toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+        document.getElementById('rounds-form').addEventListener('submit', (e) => {
+            const select = document.querySelector('select[name="rounds"]');
+            if (!select.value) {
+                e.preventDefault();
+                alert('Please select the number of rounds.');
+                return;
+            }
+            document.getElementById('rounds-spinner').style.display = 'block';
+        });
+    </script>
+</body>
+</html>

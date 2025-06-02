@@ -1,0 +1,99 @@
+<!-- profile.html -->
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Rock, Paper, Scissors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.3s;
+        }
+        .dark body {
+            background: linear-gradient(135deg, #1e293b, #475569);
+        }
+        .box {
+            animation: fadeIn 0.8s ease-in;
+        }
+        .btn {
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="min-h-screen">
+        <header class="bg-blue-900 dark:bg-gray-900 text-white p-4 shadow-md">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Rock, Paper, Scissors</h1>
+                <div class="flex items-center gap-4">
+                    <span class="font-semibold">Welcome, {{ username }}</span>
+                    <a href="{{ url_for('rounds') }}" class="btn bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        <i class="fas fa-play"></i> Back to Game
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                    <button id="theme-toggle" class="text-gray-200 hover:text-gray-400">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <div class="flex justify-center items-center mt-8">
+            <div class="box bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-2xl w-full">
+                <h2 class="text-3xl font-bold text-center text-blue-900 dark:text-blue-300 mb-6">Profile: {{ username }}</h2>
+                <div class="text-center text-lg mb-6">
+                    <p class="text-gray-700 dark:text-gray-300">Wins: {{ player_wins }} | Total Games: {{ total_games }} | Win %: {{ win_percentage }}%</p>
+                </div>
+                <h3 class="text-2xl font-semibold text-blue-800 dark:text-blue-400 mb-4">Recent Games</h3>
+                {% if games %}
+                    <div class="space-y-4">
+                        {% for game in games %}
+                            <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
+                                <p class="text-gray-700 dark:text-gray-300">Date: {{ game.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                <p class="text-gray-700 dark:text-gray-300">Rounds: {{ game.rounds }}</p>
+                                <p class="text-gray-700 dark:text-gray-300">Scores - You: {{ game.player_score }} | Computer: {{ game.computer_score }}</p>
+                                <p class="text-gray-700 dark:text-gray-300 font-semibold">Result: {{ game.result }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-center text-gray-600 dark:text-gray-400">No game history available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <script>
+        const toggleButton = document.getElementById('theme-toggle');
+        const htmlElement = document.documentElement;
+        if (localStorage.getItem('theme') === 'dark') {
+            htmlElement.classList.add('dark');
+            toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        toggleButton.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+            if (htmlElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                toggleButton.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                localStorage.setItem('theme', 'light');
+                toggleButton.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+    </script>
+</body>
+</html>
