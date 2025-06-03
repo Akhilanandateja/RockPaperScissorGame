@@ -14,6 +14,6 @@ Planned Enhancements:<br>
 2.Leaderboard to showcase top players.<br>
 3.MySQL migration for scalability.<br>
 
-🌐Website link: (https://rockpaperscissorsgame.pythonanywhere.com/)<br>
+🌐Website link: https://rockpaperscissorsgame.pythonanywhere.com/<br>
 ![Header](index.png)
 ![Header](game.png)
