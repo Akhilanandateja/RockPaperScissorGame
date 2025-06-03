@@ -1,4 +1,5 @@
-#Rock, Paper, Scissors Web Game
+<b>Rock, Paper, Scissors Web Game</b>
+
 A Flask-based web application for playing Rock, Paper, Scissors against the computer. Features user authentication (signup, login, guest play), customizable rounds, and a detailed profile page with game stats and history. Styled with Tailwind CSS and Font Awesome for a sleek, responsive design.
 
 Key Features:
